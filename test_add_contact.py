@@ -1,26 +1,31 @@
 # -*- coding: utf-8 -*-
 from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoAlertPresentException
-import unittest, time, re
+import unittest
 
 class UntitledTestCase(unittest.TestCase):
     def setUp(self):
         self.wd = webdriver.Firefox()
         self.wd.implicitly_wait(30)
 
-    def test_untitled_test_case(self):
-        wd = self.wd
+    def open_login_page(self, wd):
         wd.get("http://localhost/addressbook/index.php")
+
+    def login(self, wd, username, password):
+        wd.find_element_by_name("user").click()
         wd.find_element_by_name("user").clear()
-        wd.find_element_by_name("user").send_keys("admin")
+        wd.find_element_by_name("user").send_keys(username)
         wd.find_element_by_name("pass").clear()
-        wd.find_element_by_name("pass").send_keys("secret")
+        wd.find_element_by_name("pass").send_keys(password)
         wd.find_element_by_xpath("//input[@value='Login']").click()
+
+    # open new contact page
+    def open_new_contact_page(self, wd):
         wd.find_element_by_link_text("add new").click()
+
+    def create_contact(self, wd):
         wd.find_element_by_name("firstname").clear()
         wd.find_element_by_name("firstname").send_keys("FFname")
         wd.find_element_by_name("middlename").clear()
@@ -59,18 +64,23 @@ class UntitledTestCase(unittest.TestCase):
         wd.find_element_by_name("notes").clear()
         wd.find_element_by_name("notes").send_keys(u"123\n%^&\nйцук\nqwert")
         wd.find_element_by_xpath("//div[@id='content']/form/input[21]").click()
+
+    def open_main_page(self, wd):
         wd.find_element_by_link_text("home").click()
+
+    def logout(self, wd):
         wd.find_element_by_link_text("Logout").click()
 
-    def is_element_present(self, how, what):
-        try: self.wd.find_element(by=how, value=what)
-        except NoSuchElementException as e: return False
-        return True
+    def test_add_contact(self):
+        wd = self.wd
+        self.open_login_page(wd)
+        self.login(wd, username="admin", password="secret")
+        self.open_new_contact_page(wd)
+        self.create_contact(wd)
+        self.open_main_page(wd)
+        self.login(wd)
 
-    def is_alert_present(self):
-        try: self.wd.switch_to_alert()
-        except NoAlertPresentException as e: return False
-        return True
+
 
 
 
