@@ -12,10 +12,13 @@ class UntitledTestCase(unittest.TestCase):
         self.wd = webdriver.Firefox()
         self.wd.implicitly_wait(30)
 
-    def open_login_page(self, wd):
+    def open_login_page(self):
+        wd = self.wd
         wd.get("http://localhost/addressbook/index.php")
 
-    def login(self, wd, username, password):
+    def login(self, username, password):
+        wd = self.wd
+        self.open_login_page()
         wd.find_element_by_name("user").click()
         wd.find_element_by_name("user").clear()
         wd.find_element_by_name("user").send_keys(username)
@@ -24,10 +27,13 @@ class UntitledTestCase(unittest.TestCase):
         wd.find_element_by_xpath("//input[@value='Login']").click()
 
     # open new contact page
-    def open_new_contact_page(self, wd):
+    def open_new_contact_page(self):
+        wd = self.wd
         wd.find_element_by_link_text("add new").click()
 
-    def create_contact(self, wd, contact):
+    def create_contact(self, contact):
+        wd = self.wd
+        self.open_new_contact_page()
         wd.find_element_by_name("firstname").clear()
         wd.find_element_by_name("firstname").send_keys(contact.firstname)
         wd.find_element_by_name("middlename").clear()
@@ -66,28 +72,29 @@ class UntitledTestCase(unittest.TestCase):
         wd.find_element_by_name("notes").clear()
         wd.find_element_by_name("notes").send_keys(contact.notes)
         wd.find_element_by_xpath("//div[@id='content']/form/input[21]").click()
+        self.open_main_page()
 
-    def open_main_page(self, wd):
+    def open_main_page(self):
+        wd = self.wd
         wd.find_element_by_link_text("home").click()
 
-    def logout(self, wd):
+    def logout(self):
+        wd = self.wd
         wd.find_element_by_link_text("Logout").click()
 
     def test_add_contact(self):
-        wd = self.wd
-        self.open_login_page(wd)
-        self.login(wd, username="admin", password="secret")
-        self.open_new_contact_page(wd)
-        self.create_contact(wd,  Contact(firstname="FFname", middlename="Mm name", lastname="Ll name", nickname="Nn",
-                                           title="title",
-                                           company="comp", address="addr 1", homephone="+73258",
-                                           mobilephone="+7123456789",
-                                           email="email@test.ei", bday="7", bmonth="May", byear="1999", aday="1",
-                                           amonth="August", ayear="8888",
-                                           group_name="test_group", address2="addr 2", phone2="homie",
+        self.login(username="admin", password="secret")
+        self.create_contact(Contact(firstname="FFname", middlename="Mm name", lastname="Ll name", nickname="Nn",
+                                           title="title", company="comp",
+                                           address="addr 1",
+                                           homephone="+73258", mobilephone="+7123456789",
+                                           email="email@test.ei",
+                                           bday="7", bmonth="May", byear="1999",
+                                           aday="1", amonth="August", ayear="8888",
+                                           group_name="test_group",
+                                           address2="addr 2", phone2="homie",
                                            notes=u"123\n%^&\nйцук\nqwert"))
-        self.open_main_page(wd)
-        self.login(wd)
+        self.logout()
 
     def tearDown(self):
         self.wd.quit()
